@@ -12,7 +12,13 @@ const conn = net.createConnection({
 });
 
 conn.on('data', data => {
-  console.log('Server says: ', data);
+  if (data !== 'File not found.') {
+    console.log('File contents:');
+    console.log(data)
+    console.log('--- EOF ---')
+  } else {
+    console.log(data)
+  }
 });
 
 conn.on('connect', () => {
