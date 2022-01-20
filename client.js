@@ -1,5 +1,6 @@
 const net = require('net');
 const readline = require('readline');
+const fs = require('fs')
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -11,19 +12,20 @@ const conn = net.createConnection({
   port: 3000 // or change to the ngrok port if tunneling
 });
 
-conn.on('data', data => {
-  if (data !== 'File not found.') {
-    console.log('File contents:');
-    console.log(data)
-    console.log('--- EOF ---')
-  } else {
-    console.log(data)
-  }
-});
-
 conn.on('connect', () => {
   rl.question(`Please enter the filename you would like to fetch: \n`, answer => {
     conn.write(`${answer}`);
+    conn.on('data', data => {
+      if (data !== 'File not found') {
+        fs.writeFile(`downloads/${answer}`, data, err => {
+          if (err) return console.error(err);
+          console.log(`${answer} saved to downloads/`)
+        })
+      } else {
+        console.log(data)
+      }
+    });
+
     rl.close();
   });
 });
